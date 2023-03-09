@@ -42,6 +42,6 @@ app.use((error, req, res, next) => {
     });
 });
 
-app.listen(process.env.PORT || 4000,()=>{
+app.listen(process.env.PORT || 4001,()=>{
     console.log("Server is running...");
 })
