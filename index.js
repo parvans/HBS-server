@@ -1,12 +1,12 @@
 import express from "express"
 import bodyParser from 'body-parser'
-import mongoose from "mongoose"
 import dotenv from 'dotenv'
 import cookieParser from "cookie-parser"
 import cors from "cors";
 import authRouter from "./routers/authRouter.js"
 import hallRouter from "./routers/hallRouter.js"
 import hoursRouter from "./routers/hoursRouter.js"
+import connectDb from "./config/db.js"
 
 const app=express()
 dotenv.config()
@@ -17,14 +17,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.text())
 
-const connectDb = async ()=>{
-    try {
-        await mongoose.connect(process.env.MONGO)
-        console.log("Db connected success")
-    } catch (error) {
-        console.log(error)
-    }
-};
+// database connection
 connectDb()
 
 app.use("/api/auth",authRouter)
