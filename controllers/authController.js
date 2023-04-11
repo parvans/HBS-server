@@ -88,15 +88,27 @@ export const getUser= async(req,res,next)=>{
 export const changePassword=async(req,res,next)=>{
     let saltRounds=10;
     bcrypt.hash(req.body.newpassword,saltRounds,async(err,hash)=>{
-        let update=await User.findOneAndUpdate({_id:req.user.id},{password:hash},{new:true})
+        let update=await User.findOneAndUpdate({_id:req.params.id},{password:hash},{new:true})
         if(update){
             try {
-                res.send(update)
+                res.status(200).json({message:"password changed"})
             } catch (error) {
-                res.send(error.message)
+                res.status(500).json({message:error.message})
             }
         }else{
             res.send("student not found")
         }
     })
+}
+
+export const getProfile=async(req,res)=>{
+    try {
+        const exUser=await User.findById({_id:req.params.id}).select("-password")
+        if(!exUser){
+            res.status(404).json({message:"User not found"})
+        }
+        res.status(200).json({data:exUser})
+    } catch (error) {
+        res.status(500).json({message:error.message})
+    }
 }
