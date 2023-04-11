@@ -42,7 +42,7 @@ export const createHall=async(req,res,next)=>{
                 next(error)
             }
             
-            res.status(201).json([saveHall])
+            res.status(201).json({message:"Hall is created"})
         }
     } catch (error) {
         next(error)
