@@ -62,7 +62,16 @@ export const getById=async(req,res,next)=>{
 
 export const getAll=async(req,res,next)=>{
     try {
-        const get=await Book.find()
+        const get=await Book.find().populate({path:"hallId",model:"Hall"}).populate({path:"userId",model:"User"})
+        res.status(200).json(get)
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const userBooking=async(req,res,next)=>{
+    try {
+        const get=await Book.find().where('userId').equals(req.params.id).populate({path:"hallId",model:"Hall"})
         res.status(200).json(get)
     } catch (error) {
         next(error)
@@ -89,7 +98,7 @@ export const getHourFilter=async(req,res,next)=>{
 
 export const getOneById=async(req,res,next)=>{
     try {
-        const get=await Hour.findById({_id:req.params.id})
+        const get=await Book.findById({_id:req.params.id})
         res.status(200).json(get)
     } catch (error) {
         next(error)
