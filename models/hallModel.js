@@ -9,9 +9,6 @@ const HallSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    hours: [{
-        type: [String],
-    }]
 });
 
 const Hall= mongoose.model("Hall", HallSchema)

@@ -1,41 +1,50 @@
-import Hour from '../models/hoursModel.js'
+import Book from '../models/bookModel.js'
 import Hall from '../models/hallModel.js'
 
-export const createHour=async(req,res,next)=>{
-    const hallId= req.params.hallId//beacause take hall create Hour to the hall
-    const newHour=new Hour (req.body)
+export const createBook=async(req,res,next)=>{
+    const hallId= req.params.hallId
+    const today=new Date().toLocaleDateString()
+    const {date,reason,userId}=req.body
     try {
-        const saveHour=await newHour.save()
-        try {
-            await Hall.findByIdAndUpdate(hallId,{$push:{hours:saveHour._id}},{new:true})
-        } catch (error) {
-            next(error)
-        }IDBObjectStore
-        res.status(201).json({saveHour})
+        const hallEx=await Hall.findById({_id:hallId})
+        if(!hallEx){
+            res.status(401).json({message:"Hall does not exist"})
+        }else{
+            const isHallBooEex=await Book.find({hallId:hallId}).select("date")
+            const books=isHallBooEex.map((book)=>book.date.toLocaleDateString())
+            const dt=new Date(date).toLocaleDateString()
+            const isBooked=books.includes(dt)
+            // console.log(today);
+            // console.log(dt);
+            if(isBooked){
+                res.status(401).json({message:"Hall is booked in this date"})
+            }else if(today>dt){
+                res.status(401).json({message:"You can not book a hall in the past"})
+            }else{
+                const newBook= new Book({date:date,reason:reason,hallId:hallId,userId:userId})
+                let saveBook=await newBook.save()
+                res.status(201).json({message:"Hall is booked"})
+            }
+        }
     } catch (error) {
         next(error)
     }
 }
 
-export const updateHour=async(req,res,next)=>{
+export const updateBook=async(req,res,next)=>{
     try {
-        let updateHour=await Hour.findByIdAndUpdate(req.params.id,{$set:req.body},{new:true})
-        res.status(200).json(updateHour)
+        let updateBook=await Book.findByIdAndUpdate(req.params.id,{$set:req.body},{new:true})
+        res.status(200).json(updateBook)
     } catch (error) {
         next(error)
     }
 }
 
-export const deleteHour=async(req,res,next)=>{
+export const deleteBook=async(req,res,next)=>{
     const hallId= req.params.hallId
     try {
-        await Hour.findByIdAndDelete(req.params.id)
-        try {
-            await Hall.findByIdAndUpdate(hallId,{$pull :{hours:req.params.id}})
-        } catch (error) {   
-            next(error)
-        }
-        res.status(200).json("hall is deleted")
+        await Book.findByIdAndDelete(req.params.id)
+        res.status(200).json({message:"Booking is deleted"})
     } catch (error) {
         next(error)
     }
@@ -43,7 +52,7 @@ export const deleteHour=async(req,res,next)=>{
 
 export const getById=async(req,res,next)=>{
     try {
-        const get=await Hour.findById(req.params.id)
+        const get=await Book.findById(req.params.id)
         res.status(200).json(get)
     } catch (error) {
         next(error)
@@ -53,7 +62,7 @@ export const getById=async(req,res,next)=>{
 
 export const getAll=async(req,res,next)=>{
     try {
-        const get=await Hour.find()
+        const get=await Book.find()
         res.status(200).json(get)
     } catch (error) {
         next(error)
@@ -61,12 +70,13 @@ export const getAll=async(req,res,next)=>{
 }
 export const getAllBook=async(req,res,next)=>{
     try {
-        const get=await Hour.find()
+        const get=await Book.find()
         res.status(200).json(get)
     } catch (error) {
         next(error)
     }
 }
+//------------
 
 export const getHourFilter=async(req,res,next)=>{
     try {

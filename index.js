@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors";
 import authRouter from "./routers/authRouter.js"
 import hallRouter from "./routers/hallRouter.js"
-import hoursRouter from "./routers/hoursRouter.js"
+import bookRouter from "./routers/BookRouter.js"
 import connectDb from "./config/db.js"
 
 const app=express()
@@ -22,7 +22,7 @@ connectDb()
 
 app.use("/api/auth",authRouter)
 app.use("/api/hall",hallRouter)
-app.use("/api/hours",hoursRouter)
+app.use("/api/book",bookRouter)
 
 app.use((error, req, res, next) => {
     const errorStatus = error.status || 500;
