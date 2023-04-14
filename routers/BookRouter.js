@@ -8,7 +8,7 @@ const router=express.Router()
 
 router.post("/:hallId",createBook)
 router.put("/:id",updateBook)
-router.delete("/:id",[verifyToken,veriftyAdmin],deleteBook)
+router.delete("/:id",deleteBook)
 router.get("/find/:id",getById)
 router.get("/userBooking/:id",userBooking)
 router.get("/",getAll)

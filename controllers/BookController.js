@@ -71,7 +71,7 @@ export const getAll=async(req,res,next)=>{
 
 export const userBooking=async(req,res,next)=>{
     try {
-        const get=await Book.find().where('userId').equals(req.params.id).populate({path:"hallId",model:"Hall"})
+        const get=await Book.find().where('userId').equals(req.params.id).populate({path:"hallId",model:"Hall"}).populate({path:"userId",model:"User"})
         res.status(200).json(get)
     } catch (error) {
         next(error)
