@@ -1,3 +1,4 @@
+import Book from '../models/bookModel.js'
 import Hall from '../models/hallModel.js'
 
 export const createHall=async(req,res,next)=>{
@@ -35,6 +36,11 @@ export const getByName=async(req,res,next)=>{
 export const deleteHall=async(req,res,next)=>{
     try {
         await Hall.findByIdAndDelete(req.params.id)
+        const book=await Book.find({hallId:req.params.id})
+        book.map(async(item)=>{
+            await Book.findByIdAndDelete(item._id)
+        })
+        // await Book.findOneAndDelete({hallId:req.params.id})
         res.status(200).json({message:"Hall is deleted"})
     } catch (error) {
         next(error)

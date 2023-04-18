@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
+import Book from '../models/bookModel.js';
 
 export const getAll=async(req,res,next)=>{
     try {
-        const get=await User.find()
+        const get=await User.find().select("-password").$where("this.isAdmin==false")
         res.status(200).json(get)
     } catch (error) {
         next(error)
@@ -26,8 +27,11 @@ export const register = async (req, res, next) => {
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(req.body.password, salt);
         const find=await User.findOne({email:req.body.email})
+        const dep=await User.findOne({department:req.body.department})
         if(find){
             res.status(401).json({message:"Email already exists"});
+        }else if(dep){
+            res.status(401).json({message:"Department already exists"});
         }else{
             const newUser = new User({
                 name:req.body.name,
@@ -69,7 +73,10 @@ export const login = async (req, res, next) => {
 
 export const deleteUser= async (req,res,next)=>{
     try {
-        await  User.findOneAndDelete({email:req.body.email})
+        const exUser=await User.findById({_id:req.params.id})
+        if(!exUser) return res.status(404).json({message:"User not found"});
+        await  User.findByIdAndDelete({_id:req.params.id})
+        await Book.findOneAndDelete({userId:req.params.id})
         res.status(200).json({message:"User has been deleted."});
     } catch (error) {
         next(error);
@@ -99,6 +106,19 @@ export const changePassword=async(req,res,next)=>{
             res.send("student not found")
         }
     })
+}
+
+export const updateUser=async(req,res)=>{
+    try {
+        const userExist=await User.findById({_id:req.params.id})
+        if(!userExist){
+            res.status(404).json({message:"User not found"})
+        }
+        await User.findByIdAndUpdate({_id:req.params.id},{$set:req.body},{new:true})
+        res.status(200).json({message:"User has been updated."});
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 }
 
 export const getProfile=async(req,res)=>{
